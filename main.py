@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from database import engine, get_db
 from models import Base, Course
-from schemas import CourseCreate, CourseRead
+from schemas import CourseCreate, CourseRead, CourseUpdate
 
 Base.metadata.create_all(bind=engine)
 
@@ -31,3 +31,22 @@ def get_course(course_id: int, db: Session = Depends(get_db)):
     if course is None:
         raise HTTPException(status_code=404, detail="Course not found")
     return course
+
+@app.put("/courses/{course_id}", response_model=CourseRead)
+def update_course(course_id: int, updates: CourseUpdate, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
+    if course is None:
+        raise HTTPException(status_code=404, detail="Course not found")
+    for field, value in updates.model_dump(exclude_unset=True).items():
+        setattr(course, field, value)
+    db.commit()
+    db.refresh(course)
+    return course
+
+@app.delete("/courses/{course_id}", status_code=204)
+def delete_course(course_id: int, db: Session = Depends(get_db)):
+    course = db.query(Course).filter(Course.id == course_id).first()
+    if course is None:
+        raise HTTPException(status_code=404, detail="Course not found")
+    db.delete(course)
+    db.commit()
