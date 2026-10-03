@@ -15,3 +15,10 @@ class CourseRead(CourseBase):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+class CourseUpdate(BaseModel):
+    name: Optional[str] = None
+    code: Optional[str] = None
+    units: Optional[float] = None
+    grade: Optional[str] = None
+    semester: Optional[str] = None
