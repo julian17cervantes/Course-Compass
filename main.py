@@ -2,6 +2,7 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
 from database import engine, get_db
+from gpa import calculate_gpa
 from models import Base, Course
 from schemas import CourseCreate, CourseRead, CourseUpdate
 
@@ -50,3 +51,19 @@ def delete_course(course_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Course not found")
     db.delete(course)
     db.commit()
+
+@app.get("/gpa")
+def get_gpa(db: Session = Depends(get_db)):
+    courses = db.query(Course).all()
+    cumulative = calculate_gpa([(c.grade, c.units) for c in courses])
+
+    by_semester = {}
+    for c in courses:
+        by_semester.setdefault(c.semester, []).append((c.grade, c.units))
+    return {
+        "cumulative": cumulative,
+        "by_semester": {
+            semester: calculate_gpa(pairs)
+            for semester, pairs in by_semester.items()
+        },
+    }
