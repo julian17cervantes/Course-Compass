@@ -61,7 +61,7 @@ def get_gpa(db: Session = Depends(get_db)):
     for c in courses:
         by_semester.setdefault(c.semester, []).append((c.grade, c.units))
     return {
-        "cumulative": cumulative,
+        "cumulative_gpa": cumulative,
         "by_semester": {
             semester: calculate_gpa(pairs)
             for semester, pairs in by_semester.items()

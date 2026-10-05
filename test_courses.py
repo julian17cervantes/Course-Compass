@@ -1,6 +1,6 @@
 COURSE = {
     "name": "Intro to Programming",
-    "code": "CECS 174",
+    "code": "CS101",
     "units": 3,
     "grade": "A",
     "semester": "Fall 2025",
