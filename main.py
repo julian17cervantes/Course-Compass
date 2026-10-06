@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session
 from database import engine, get_db
 from gpa import calculate_gpa
 from models import Base, Course, User
-from schemas import CourseCreate, CourseRead, CourseUpdate, UserCreate, UserRead
-from auth import hash_password
+from schemas import CourseCreate, CourseRead, CourseUpdate, Token, UserCreate, UserRead
+from auth import create_access_token, hash_password, verify_password
 
 Base.metadata.create_all(bind=engine)
 
@@ -79,3 +79,10 @@ def signup(user: UserCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+@app.post("/login", response_model=Token)
+def login(user: UserCreate, db: Session = Depends(get_db)):
+    db_user = db.query(User).filter(User.email == user.email).first()
+    if db_user is None or not verify_password(user.password, db_user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    return {"access_token": create_access_token(db_user.email), "token_type": "bearer"}
