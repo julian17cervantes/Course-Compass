@@ -22,3 +22,13 @@ class CourseUpdate(BaseModel):
     units: Optional[float] = None
     grade: Optional[str] = None
     semester: Optional[str] = None
+
+class UserCreate(BaseModel):
+    email: str
+    password: str
+
+class UserRead(BaseModel):
+    id: int
+    email: str
+
+    model_config = ConfigDict(from_attributes=True)

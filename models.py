@@ -12,3 +12,10 @@ class Course(Base):
     units = Column(Float, nullable=False)
     grade = Column(String, nullable=True)
     semester = Column(String, nullable=False)
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, nullable=False, index=True)
+    hashed_password = Column(String, nullable=False)
