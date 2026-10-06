@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 
 from database import engine, get_db
 from gpa import calculate_gpa
-from models import Base, Course
-from schemas import CourseCreate, CourseRead, CourseUpdate
+from models import Base, Course, User
+from schemas import CourseCreate, CourseRead, CourseUpdate, UserCreate, UserRead
+from auth import hash_password
 
 Base.metadata.create_all(bind=engine)
 
@@ -67,3 +68,14 @@ def get_gpa(db: Session = Depends(get_db)):
             for semester, pairs in by_semester.items()
         },
     }
+
+@app.post("/signup", response_model=UserRead, status_code=201)
+def signup(user: UserCreate, db: Session = Depends(get_db)):
+    existing = db.query(User).filter(User.email == user.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Email alreadly registered")
+    db_user = User(email=user.email, hashed_password=hash_password(user.password))
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
