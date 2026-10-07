@@ -25,8 +25,8 @@ def create_course(course: CourseCreate, db: Session = Depends(get_db), current_u
     return db_course
 
 @app.get("/courses", response_model=list[CourseRead])
-def list_courses(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    return db.query(Course).filter(Course.user_id == current_user.id.all())
+def list_courses(db: Session = Depends(get_db), current_user: User = Depends(get_current_user),):
+    return db.query(Course).filter(Course.user_id == current_user.id).all()
 
 @app.get("/courses/{course_id}", response_model=CourseRead)
 def get_course(course_id: int, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
