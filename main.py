@@ -55,20 +55,15 @@ def delete_course(course_id: int, db: Session = Depends(get_db), current_user: U
     db.commit()
 
 @app.get("/gpa")
-def get_gpa(db: Session = Depends(get_db)):
-    courses = db.query(Course).all()
+def get_gpa(db: Session = Depends(get_db), current_user: User = Depends(get_current_user),):
+    courses = db.query(Course).filter(Course.user_id == current_user.id).all()
     cumulative = calculate_gpa([(c.grade, c.units) for c in courses])
 
     by_semester = {}
     for c in courses:
         by_semester.setdefault(c.semester, []).append((c.grade, c.units))
-    return {
-        "cumulative_gpa": cumulative,
-        "by_semester": {
-            semester: calculate_gpa(pairs)
-            for semester, pairs in by_semester.items()
-        },
-    }
+
+    return {"cumulative_gpa": cumulative, "by_semester": {semester: calculate_gpa(pairs) for semester, pairs in by_semester.items()},}
 
 @app.post("/signup", response_model=UserRead, status_code=201)
 def signup(user: UserCreate, db: Session = Depends(get_db)):
