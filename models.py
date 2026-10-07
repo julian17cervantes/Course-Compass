@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Float, Integer, String
+from sqlalchemy import Column, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import declarative_base
 
 Base = declarative_base()
@@ -12,6 +12,7 @@ class Course(Base):
     units = Column(Float, nullable=False)
     grade = Column(String, nullable=True)
     semester = Column(String, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
 
 class User(Base):
     __tablename__ = "users"
