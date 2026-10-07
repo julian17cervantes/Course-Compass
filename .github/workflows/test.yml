@@ -26,6 +26,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@localhost:5432/course_compass
+      SECRET_KEY: test-secret-key-for-ci-only
 
     steps:
       - uses: actions/checkout@v4
