@@ -29,6 +29,14 @@ uvicorn main:app --reload
 
 Then open http://127.0.0.1:8000/docs for the interactive API docs.
 
+## Run with Docker
+
+```bash
+docker compose up --build
+```
+
+Then open http://127.0.0.1:8000/docs.
+
 ## Running tests
 
 ```bash
