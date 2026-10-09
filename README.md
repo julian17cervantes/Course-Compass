@@ -1,8 +1,9 @@
 # Course Compass
 
-![Tests](https://github.com/julian17cervantes/Course-Compass/actions/workflows/tests.yml/badge.svg)
 
 A REST API for tracking college courses and calculating GPA, built with FastAPI and PostgreSQL.
+
+**Live demo:** https://your-app.up.railway.app/docs
 
 ## Features
 
