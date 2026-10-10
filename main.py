@@ -2,9 +2,9 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
 from database import engine, get_db
-from gpa import calculate_gpa
+from gpa import calculate_gpa, required_gpa
 from models import Base, Course, User
-from schemas import CourseCreate, CourseRead, CourseUpdate, Token, UserCreate, UserRead
+from schemas import CourseCreate, CourseRead, CourseUpdate, GoalUpdate, Token, UserCreate, UserRead
 from auth import create_access_token, hash_password, verify_password, get_current_user
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -82,3 +82,26 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
     if db_user is None or not verify_password(form_data.password, db_user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid email or password")
     return {"access_token": create_access_token(db_user.email), "token_type": "bearer"}
+
+@app.put("/goal")
+def set_goal(
+    goal: GoalUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if not 0.0 <= goal.goal_gpa <= 4.0:
+        raise HTTPException(status_code=400, detail="Goal GPA must be between 0.0 and 4.0")
+    current_user.goal_gpa = goal.goal_gpa
+    db.commit()
+    return {"goal_gpa": current_user.goal_gpa}
+
+
+@app.get("/goal")
+def get_goal_plan(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    if current_user.goal_gpa is None:
+        raise HTTPException(status_code=400, detail="Set a goal GPA first with PUT /goal")
+    courses = db.query(Course).filter(Course.user_id == current_user.id).all()
+    return required_gpa(current_user.goal_gpa, [(c.grade, c.units) for c in courses])

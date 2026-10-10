@@ -36,3 +36,6 @@ class UserRead(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+class GoalUpdate(BaseModel):
+    goal_gpa: float
