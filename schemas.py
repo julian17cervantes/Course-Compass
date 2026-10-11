@@ -39,3 +39,8 @@ class Token(BaseModel):
 
 class GoalUpdate(BaseModel):
     goal_gpa: float
+
+class FinalGradeRequest(BaseModel):
+    current_percent: float
+    final_weight_percent: float
+    target_percent: float

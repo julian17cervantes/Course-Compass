@@ -1,4 +1,6 @@
-from gpa import calculate_gpa, required_gpa
+import pytest
+
+from gpa import calculate_gpa, final_score_needed, required_gpa
 
 def test_single_course():
     assert calculate_gpa([("A", 3)]) == 4.0
@@ -32,3 +34,26 @@ def test_required_gpa_already_met():
 def test_required_gpa_no_upcoming_courses():
     result = required_gpa(3.5, [("B", 3)])
     assert result["status"] == "no_upcoming_courses"
+
+def test_final_score_achievable():
+    # (85 - 90 * 0.8) / 0.2 = 65
+    result = final_score_needed(90, 20, 85)
+    assert result["status"] == "achievable"
+    assert result["needed_on_final"] == 65.0
+
+
+def test_final_score_impossible():
+    # (90 - 70 * 0.7) / 0.3 = 136.67, more than 100%
+    result = final_score_needed(70, 30, 90)
+    assert result["status"] == "impossible"
+
+
+def test_final_score_already_met():
+    result = final_score_needed(100, 20, 70)
+    assert result["status"] == "already_met"
+    assert result["needed_on_final"] == 0.0
+
+
+def test_final_score_rejects_bad_weight():
+    with pytest.raises(ValueError):
+        final_score_needed(90, 0, 85)
