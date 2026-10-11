@@ -10,6 +10,8 @@ A REST API for tracking college courses and calculating GPA, built with FastAPI 
 - Full CRUD for courses (create, list, fetch, update, delete)
 - Unit-weighted GPA calculation, cumulative and per semester
 - Automated tests run on every push and pull request with GitHub Actions
+- JWT authentication with bcrypt password hashing, and per-user data isolation
+- Goal GPA planner that calculates the average grade needed on upcoming courses
 
 ## Tech stack
 
@@ -48,9 +50,13 @@ pytest
 
 | Method | Path | Description |
 | --- | --- | --- |
+| POST | /signup | Create an account |
+| POST | /login | Log in and receive a JWT |
 | POST | /courses | Create a course |
-| GET | /courses | List all courses |
+| GET | /courses | List your courses |
 | GET | /courses/{id} | Get one course |
 | PUT | /courses/{id} | Update a course |
 | DELETE | /courses/{id} | Delete a course |
 | GET | /gpa | Cumulative and per-semester GPA |
+| PUT | /goal | Set your goal GPA |
+| GET | /goal | See the grades you need on upcoming courses |
