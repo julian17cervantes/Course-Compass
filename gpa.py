@@ -60,3 +60,23 @@ def required_gpa(goal, courses):
             g for g in GRADE_ORDER if GRADE_POINTS[g] >= required
         )
     return result
+
+def final_score_needed(current_percent, final_weight_percent, target_percent):
+    """current_percent is the percentage earned on everything before the final."""
+    if not 0 < final_weight_percent <= 100:
+        raise ValueError("final_weight_percent must be between 0 and 100")
+
+    weight = final_weight_percent / 100
+    needed = (target_percent - current_percent * (1 - weight)) / weight
+
+    if needed <= 0:
+        status = "already_met"
+    elif needed > 100:
+        status = "impossible"
+    else:
+        status = "achievable"
+
+    return {
+        "needed_on_final": round(max(needed, 0.0), 2),
+        "status": status,
+    }
