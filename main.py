@@ -2,9 +2,9 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
 from database import engine, get_db
-from gpa import calculate_gpa, required_gpa
+from gpa import calculate_gpa, final_score_needed, required_gpa
 from models import Base, Course, User
-from schemas import CourseCreate, CourseRead, CourseUpdate, GoalUpdate, Token, UserCreate, UserRead
+from schemas import CourseCreate, CourseRead, CourseUpdate, FinalGradeRequest, GoalUpdate, Token, UserCreate, UserRead
 from auth import create_access_token, hash_password, verify_password, get_current_user
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -87,8 +87,7 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
 def set_goal(
     goal: GoalUpdate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
+    current_user: User = Depends(get_current_user),):
     if not 0.0 <= goal.goal_gpa <= 4.0:
         raise HTTPException(status_code=400, detail="Goal GPA must be between 0.0 and 4.0")
     current_user.goal_gpa = goal.goal_gpa
@@ -99,9 +98,21 @@ def set_goal(
 @app.get("/goal")
 def get_goal_plan(
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
+    current_user: User = Depends(get_current_user),):
     if current_user.goal_gpa is None:
         raise HTTPException(status_code=400, detail="Set a goal GPA first with PUT /goal")
     courses = db.query(Course).filter(Course.user_id == current_user.id).all()
     return required_gpa(current_user.goal_gpa, [(c.grade, c.units) for c in courses])
+
+@app.post("/final-grade")
+def final_grade(
+    request: FinalGradeRequest,
+    current_user: User = Depends(get_current_user),):
+    try:
+        return final_score_needed(
+            request.current_percent,
+            request.final_weight_percent,
+            request.target_percent,
+        )
+    except ValueError as error:
+        raise HTTPException(status_code=400, detail=str(error))
