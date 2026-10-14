@@ -12,6 +12,7 @@ A REST API for tracking college courses and calculating GPA, built with FastAPI 
 - Automated tests run on every push and pull request with GitHub Actions
 - JWT authentication with bcrypt password hashing, and per-user data isolation
 - Goal GPA planner that calculates the average grade needed on upcoming courses
+- Final exam calculator that shows the score needed on a final to reach a target grade
 
 ## Tech stack
 
@@ -60,3 +61,4 @@ pytest
 | GET | /gpa | Cumulative and per-semester GPA |
 | PUT | /goal | Set your goal GPA |
 | GET | /goal | See the grades you need on upcoming courses |
+| POST | /final-grade | Score needed on a final to reach a target grade |
