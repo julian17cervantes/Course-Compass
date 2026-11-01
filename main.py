@@ -37,7 +37,7 @@ def get_course(course_id: int, db: Session = Depends(get_db), current_user: User
 
 @app.put("/courses/{course_id}", response_model=CourseRead)
 def update_course(course_id: int, updates: CourseUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    course = db.query(Course).filter(Course.id == course_id, Course.id == current_user.id).first()
+    course = db.query(Course).filter(Course.id == course_id, Course.user_id == current_user.id).first()
     if course is None:
         raise HTTPException(status_code=404, detail="Course not found")
     for field, value in updates.model_dump(exclude_unset=True).items():
