@@ -58,3 +58,13 @@ export async function login(email, password) {
 export const logout = () => clearToken();
 
 export const listCourses = () => request("/courses");
+
+const jsonBody = (method, body) => ({
+  method,
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(body),
+});
+
+export const createCourse = (course) => request("/courses", jsonBody("POST", course));
+export const updateCourse = (id, fields) => request(`/courses/${id}`, jsonBody("PUT", fields));
+export const deleteCourse = (id) => request(`/courses/${id}`, { method: "DELETE" });
