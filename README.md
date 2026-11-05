@@ -33,6 +33,18 @@ uvicorn main:app --reload
 
 Then open http://127.0.0.1:8000/docs for the interactive API docs.
 
+## Frontend
+
+A React single-page app (built with Vite) lets you sign up, log in, manage courses, see your GPA, and plan toward a goal GPA. In production, FastAPI serves the built app from the same address as the API, so there is one deployment.
+
+```bash
+# development: run the API and the React dev server
+uvicorn main:app --reload
+cd frontend && npm install && npm run dev   # opens http://localhost:5173
+```
+
+The login token is kept in `sessionStorage`, so it clears when the tab closes. A more secure design would use an httpOnly cookie, which would need backend changes.
+
 ## Run with Docker
 
 ```bash
