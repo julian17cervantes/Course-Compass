@@ -68,3 +68,16 @@ const jsonBody = (method, body) => ({
 export const createCourse = (course) => request("/courses", jsonBody("POST", course));
 export const updateCourse = (id, fields) => request(`/courses/${id}`, jsonBody("PUT", fields));
 export const deleteCourse = (id) => request(`/courses/${id}`, { method: "DELETE" });
+
+export const getGpa = () => request("/gpa");
+
+export async function getGoalPlan() {
+  try {
+    return await request("/goal");
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 400) return null; // no goal set yet
+    throw err;
+  }
+}
+
+export const setGoal = (goalGpa) => request("/goal", jsonBody("PUT", { goal_gpa: goalGpa }));

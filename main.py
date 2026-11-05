@@ -1,3 +1,8 @@
+from pathlib import Path
+
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
+
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 
@@ -12,9 +17,17 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-@app.get("/")
+FRONTEND_DIST = Path(__file__).parent / "frontend" / "dist"
+
+if (FRONTEND_DIST / "assets").is_dir():
+    app.mount("/assets", StaticFiles(directory=FRONTEND_DIST / "assets"), name="assets")
+
+@app.get("/", include_in_schema=False)
 def read_root():
-    return {"message": "Cource Compass is alive"}
+    index = FRONTEND_DIST / "index.html"
+    if index.is_file():
+        return FileResponse(index)
+    return {"message": "Course Compass is alive"}
 
 @app.post("/courses", response_model=CourseRead, status_code=201)
 def create_course(course: CourseCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
